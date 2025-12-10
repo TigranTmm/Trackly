@@ -1,8 +1,6 @@
 package app.trackly.data.model
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import app.trackly.domain.model.Sphere
 import app.trackly.domain.model.Task
@@ -11,4 +9,8 @@ import app.trackly.domain.model.Task
 abstract class TracklyDataBase : RoomDatabase() {
     abstract val taskDao: TaskDao
     abstract val sphereDao: SphereDao
+
+    companion object {
+        const val DATABASE_NAME = "trackly_db"
+    }
 }
