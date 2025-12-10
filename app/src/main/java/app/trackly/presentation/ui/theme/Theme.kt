@@ -1,4 +1,4 @@
-package app.trackly.ui.theme
+package app.trackly.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
