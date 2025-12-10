@@ -1,4 +1,4 @@
-package app.trackly.presentation
+package app.trackly
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
