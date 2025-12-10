@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.Flow
 class TaskRepositoryImpl(
     private val dao: TaskDao
 ) : TaskRepository {
-    override fun getTasks(): Flow<List<Task>> {
-        return dao.getTasks()
+    override fun getAllTasks(): Flow<List<Task>> {
+        return dao.getAllTasks()
     }
 
-    override fun getTasksByDay(day: Long): Flow<List<Task>> {
-        return dao.getTasksByDay(day)
+    override fun getTasksBySphere(sphereId: Int): Flow<List<Task>> {
+        return dao.getTasksBySphere(sphereId)
     }
 
     override suspend fun getTask(id: Int): Task? {

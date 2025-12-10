@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
     @Query("SELECT * FROM task")
-    fun getTasks(): Flow<List<Task>>
+    fun getAllTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM task WHERE date(timestamp / 1000, 'unixepoch') = date(:day / 1000, 'unixepoch')")
-    fun getTasksByDay(day: Long): Flow<List<Task>>
+    @Query("SELECT * FROM task WHERE sphereId = :sphereId")
+    fun getTasksBySphere(sphereId: Int): Flow<List<Task>>
 
     @Query("SELECT * FROM task WHERE id = :id")
     suspend fun getTask(id: Int): Task?
