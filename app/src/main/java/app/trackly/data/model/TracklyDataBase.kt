@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import app.trackly.domain.model.Sphere
 import app.trackly.domain.model.Task
 
-@Database (entities = [Task::class, Sphere::class], version = 2)
+@Database (entities = [Task::class, Sphere::class], version = 2, exportSchema = false)
 abstract class TracklyDataBase : RoomDatabase() {
     abstract val taskDao: TaskDao
     abstract val sphereDao: SphereDao
