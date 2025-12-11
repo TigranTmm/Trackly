@@ -28,3 +28,10 @@ fun HomeScreen(
         }
     }
 }
+
+
+@Preview
+@Composable
+fun prev() {
+    HomeScreen()
+}
