@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Trackly</string>
+
+    <!-- TITLES -->
+    <string name="home_title">HOME</string>
+    <string name="profile_title">PROFILE</string>
+    <string name="all_tasks_title">ALL TASKS</string>
+
+    <string name="spheres">Spheres:</string>
+    <string name="days_completed">Days completed:</string>
+    <string name="add_sphere">Add new sphere</string>
 </resources>
