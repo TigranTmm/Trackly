@@ -8,10 +8,11 @@ import app.trackly.presentation.ui.theme.Red
 
 @Entity
 data class Task(
-    @PrimaryKey val id: Int? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val sphereId: Int,
     val content: String,
     val priority: Int,
+    val completed: Boolean = false
 ) {
     companion object {
         const val DEFAULT_PRIORITY = 0

@@ -1,5 +1,6 @@
 package app.trackly.domain.model
 
+import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.trackly.presentation.ui.theme.Blue
@@ -10,12 +11,17 @@ import app.trackly.presentation.ui.theme.Yellow
 
 @Entity
 data class Sphere(
-    @PrimaryKey val id: Int? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val title: String,
-    val timeTrackingSystem: Boolean
+    val color: String = "RED"
 ) {
     companion object {
-        const val DEFAULT_TTS = false
-        val primaryColors = listOf(Red, Orange, Yellow, Green, Blue)
+        val primaryColors = mapOf(
+            "RED" to Red,
+            "ORANGE" to Orange,
+            "YELLOW" to Yellow,
+            "GREEN" to Green,
+            "BLUE" to Blue
+        )
     }
 }

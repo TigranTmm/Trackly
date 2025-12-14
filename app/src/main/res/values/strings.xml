@@ -6,6 +6,12 @@
     <string name="profile_title">PROFILE</string>
     <string name="all_tasks_title">ALL TASKS</string>
 
+    <!-- DIALOG -->
+    <string name="enter_name">Enter sphere title</string>
+    <string name="choose_the_color">Choose the color</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+
     <string name="spheres">Spheres:</string>
     <string name="days_completed">Days completed:</string>
     <string name="add_sphere">Add new sphere</string>

@@ -7,6 +7,6 @@ class DeleteSphere(
     private val repository: SphereRepository
 ) {
     suspend operator fun invoke(sphere: Sphere) {
-        repository.insertSphere(sphere)
+        repository.deleteSphere(sphere)
     }
 }

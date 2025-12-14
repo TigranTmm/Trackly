@@ -37,7 +37,7 @@ object AppModule {
             app,
             TracklyDataBase::class.java,
             TracklyDataBase.DATABASE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     // Task Repository

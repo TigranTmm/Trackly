@@ -16,10 +16,13 @@ val BackGr = Color(0xFF121313)
 val ShapeBg = Color(0xFF2C2D2F)
 val ShapeBorder = Color(0xFF4B4C4E)
 val Border = Color(0xFF494A4A)
+val LightWhite = Color(0xFF292A2A)
+val ButtonBg = Color(0xFF474A50)
 
 
 /** TEXT_COLORS **/
 val Text = Color(0xFFE8E8E8)
+val GrayText = Color(0xFF606060)
 
 
 /** EMPHASIS_COLORS **/
