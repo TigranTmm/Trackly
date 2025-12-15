@@ -31,14 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,30 +47,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import app.trackly.R
 import app.trackly.domain.model.Sphere
-import app.trackly.presentation.navigation.bottom_bar.shape
+import app.trackly.presentation.screens.sphere_screen.SphereScreenRoute
 import app.trackly.presentation.ui.theme.BackGr
 import app.trackly.presentation.ui.theme.Blue
 import app.trackly.presentation.ui.theme.Border
 import app.trackly.presentation.ui.theme.ButtonBg
 import app.trackly.presentation.ui.theme.GrayText
 import app.trackly.presentation.ui.theme.Green
-import app.trackly.presentation.ui.theme.LightWhite
 import app.trackly.presentation.ui.theme.Montserrat
 import app.trackly.presentation.ui.theme.Orange
 import app.trackly.presentation.ui.theme.Red
@@ -86,11 +80,15 @@ import app.trackly.presentation.ui.theme.Yellow
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavController,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val spheres by viewModel.spheresList.collectAsState(emptyList())
 
     var showDialog by remember { mutableStateOf(false) }
+
+    val interactionSource = remember { MutableInteractionSource() }
+
 
 
     Scaffold(
@@ -160,7 +158,7 @@ fun HomeScreen(
                         .clickable(
                             onClick = { showDialog = true },
                             indication = LocalIndication.current,
-                            interactionSource = remember { MutableInteractionSource() }
+                            interactionSource = interactionSource
                         ) // showing dialogue
                         .drawBehind {
                             val strokeWidth = 2.dp.toPx()
@@ -230,13 +228,30 @@ fun HomeScreen(
                     }
                 )
 
+                val itemInteractionSource = remember { MutableInteractionSource() }
+
                 SwipeToDismissBox(
                     state = dismissState,
                     enableDismissFromStartToEnd = false,
                     enableDismissFromEndToStart = true,
                     backgroundContent = { DeleteBackground() },
+                    modifier = Modifier.clickable(
+                        interactionSource = itemInteractionSource,
+                        indication = null,
+                        onClick = {
+                            navController.navigate(
+                                route = SphereScreenRoute.Sphere.createRoute(
+                                    id = sphere.id!!,
+                                    title = sphere.title,
+                                    color = sphere.color
+                                )
+                            )
+                        }
+                    )
                 ) {
-                    SphereItem(sphere)
+                    SphereItem(
+                        sphere
+                    )
                 }
             }
         }
@@ -245,7 +260,9 @@ fun HomeScreen(
 
 
 @Composable
-fun SphereItem(sphere: Sphere) {
+fun SphereItem(
+    sphere: Sphere,
+) {
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier
@@ -476,5 +493,4 @@ fun DeleteBackground() {
 @Preview(showSystemUi = true)
 @Composable
 fun prev() {
-    DeleteBackground()
 }

@@ -18,6 +18,7 @@ val ShapeBorder = Color(0xFF4B4C4E)
 val Border = Color(0xFF494A4A)
 val LightWhite = Color(0xFF292A2A)
 val ButtonBg = Color(0xFF474A50)
+val PriorityBg = Color(0xFF414243)
 
 
 /** TEXT_COLORS **/
@@ -31,6 +32,7 @@ val Orange = Color(0xFFFF8800)
 val Yellow = Color(0xFFFFC000)
 val Green = Color(0xFF00DA66)
 val Blue = Color(0xFF06A8FF)
+val Gray = Color(0xFF71757F)
 
 
 /** BOTTOM_NAV **/
