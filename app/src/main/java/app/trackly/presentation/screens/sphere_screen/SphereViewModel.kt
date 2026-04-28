@@ -22,12 +22,13 @@ class SphereViewModel @Inject constructor(
 ) : ViewModel() {
     private val _sphereId = MutableStateFlow<Int?>(null)
     val sphereId = _sphereId.asStateFlow()
+    var tasksOrder = "default"
 
     val tasksList: Flow<List<Task>> =
         sphereId
             .filterNotNull()
             .flatMapLatest { id ->
-                taskUseCases.getTasksBySphere(id)
+                taskUseCases.getTasksBySphere(id, order = tasksOrder)
             }
         .stateIn(
             scope = viewModelScope,

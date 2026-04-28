@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -146,13 +147,36 @@ fun SphereScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // TASKS_TITLE
-                Text(
-                    text = "Tasks:",
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                    color = Text
-                )
+                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
+                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
+                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
+                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
+                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
+                Row() {
+                    Text(
+                        text = "Tasks:",
+                        fontFamily = Montserrat,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = Text
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Checkbox(
+                        onCheckedChange = {
+                            viewModel.tasksOrder = "high_to_low"
+                        },
+                        checked = true,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Yellow,
+                            checkmarkColor = ShapeBg,
+                            uncheckedColor = Border
+                        ),
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -210,7 +234,7 @@ fun SphereScreen(
                     }
                 }
 
-                // ADDING NEW SPHERE
+                // ADDING NEW TASK
                 if (showDialog) {
                     AddTaskDialog(
                         onDismiss = { showDialog = false },
@@ -566,8 +590,35 @@ fun PriorityItem(
     }
 }
 
+
+
+
 @Preview
 @Composable
 fun Prev() {
-    TaskItem(Task(1, 1, "sdfsd", 1, true)) { }
+    Row() {
+        Text(
+            text = "Tasks:",
+            fontFamily = Montserrat,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            color = Text
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Checkbox(
+            onCheckedChange = {
+
+            },
+            checked = true,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Yellow,
+                checkmarkColor = ShapeBg,
+                uncheckedColor = Border
+            ),
+            modifier = Modifier
+                .padding(end = 8.dp)
+        )
+    }
 }
