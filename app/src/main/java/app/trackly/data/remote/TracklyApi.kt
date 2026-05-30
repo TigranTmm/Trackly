@@ -1,13 +1,17 @@
 package app.trackly.data.remote
 
+import app.trackly.data.remote.dto.CreateSessionRequestDto
+import app.trackly.data.remote.dto.FinishSessionRequestDto
 import app.trackly.data.remote.dto.LoginRequestDto
 import app.trackly.data.remote.dto.LoginResponseDto
 import app.trackly.data.remote.dto.RegisterRequestDto
 import app.trackly.data.remote.dto.RegisterResponseDto
+import app.trackly.data.remote.dto.SessionResponseDto
 import app.trackly.data.remote.dto.SphereRequestDto
 import app.trackly.data.remote.dto.SphereResponseDto
 import app.trackly.data.remote.dto.TaskRequestDto
 import app.trackly.data.remote.dto.TaskResponseDto
+import app.trackly.data.remote.dto.WeeklyAnalyticsResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -116,5 +120,88 @@ class TracklyApi @Inject constructor(
         taskId: Long
     ) {
         client.delete("spheres/$sphereId/tasks/$taskId")
+    }
+
+    /** Sessions **/
+    suspend fun createSession(
+        sphereId: Long,
+        request: CreateSessionRequestDto
+    ): SessionResponseDto {
+        val response = client.post("spheres/$sphereId/sessions") {
+            setBody(request)
+        }
+
+        return response.body<SessionResponseDto>()
+    }
+
+    suspend fun getSessionsBySphere(
+        sphereId: Long
+    ): List<SessionResponseDto> {
+        val response = client.get("spheres/$sphereId/sessions")
+        return response.body<List<SessionResponseDto>>()
+    }
+
+    suspend fun getSessionById(
+        sphereId: Long,
+        sessionId: Long
+    ): SessionResponseDto {
+        val response = client.get("spheres/$sphereId/sessions/$sessionId")
+        return response.body<SessionResponseDto>()
+    }
+
+    suspend fun deleteSession(
+        sphereId: Long,
+        sessionId: Long
+    ) {
+        client.delete("spheres/$sphereId/sessions/$sessionId")
+    }
+
+    suspend fun getWeekSessions(
+        sphereId: Long
+    ): List<SessionResponseDto> {
+        val response = client.get("spheres/$sphereId/sessions/week")
+        return response.body<List<SessionResponseDto>>()
+    }
+
+    suspend fun startSession(
+        sphereId: Long,
+        sessionId: Long
+    ): SessionResponseDto {
+        val response = client.post("spheres/$sphereId/sessions/$sessionId/start")
+        return response.body<SessionResponseDto>()
+    }
+
+    suspend fun pauseSession(
+        sphereId: Long,
+        sessionId: Long
+    ): SessionResponseDto {
+        val response = client.post("spheres/$sphereId/sessions/$sessionId/pause")
+        return response.body<SessionResponseDto>()
+    }
+
+    suspend fun finishSession(
+        sphereId: Long,
+        sessionId: Long,
+        request: FinishSessionRequestDto
+    ): SessionResponseDto {
+        val response = client.post("spheres/$sphereId/sessions/$sessionId/finish") {
+            setBody(request)
+        }
+
+        return response.body<SessionResponseDto>()
+    }
+
+    suspend fun cancelSession(
+        sphereId: Long,
+        sessionId: Long
+    ): SessionResponseDto {
+        val response = client.post("spheres/$sphereId/sessions/$sessionId/cancel")
+        return response.body<SessionResponseDto>()
+    }
+
+    /** Analytics **/
+    suspend fun getWeeklyAnalytics(): WeeklyAnalyticsResponseDto {
+        val response = client.get("analytics/weekly")
+        return response.body()
     }
 }

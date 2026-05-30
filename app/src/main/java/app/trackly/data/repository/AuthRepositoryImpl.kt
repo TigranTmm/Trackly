@@ -13,9 +13,10 @@ class AuthRepositoryImpl @Inject constructor(
     private val api: TracklyApi,
     private val tokenManager: TokenManager
 ) : AuthRepository {
-    override suspend fun register(email: String, password: String) {
+    override suspend fun register(login: String, email: String, password: String) {
         api.register(
             RegisterRequestDto(
+                login = login,
                 email = email,
                 password = password
             )

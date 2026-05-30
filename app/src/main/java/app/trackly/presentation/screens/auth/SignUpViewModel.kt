@@ -10,23 +10,33 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class LoginUiState(
+data class SignUpUiState(
+    val login: String = "",
     val email: String = "",
     val password: String = "",
+    val loginError: Boolean = false,
     val emailError: Boolean = false,
     val passwordError: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isLoggedIn: Boolean = false
+    val isRegistered: Boolean = false
 )
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(LoginUiState())
+    private val _state = MutableStateFlow(SignUpUiState())
     val state = _state.asStateFlow()
+
+    fun onLoginChange(value: String) {
+        _state.value = _state.value.copy(
+            login = value,
+            loginError = false,
+            errorMessage = null
+        )
+    }
 
     fun onEmailChange(value: String) {
         _state.value = _state.value.copy(
@@ -44,17 +54,19 @@ class LoginViewModel @Inject constructor(
         )
     }
 
-    fun login() {
+    fun signUp() {
         val current = _state.value
 
-        val hasEmailError = current.email.isBlank()
-        val hasPasswordError = current.password.isBlank()
+        val loginError = current.login.isBlank()
+        val emailError = current.email.isBlank()
+        val passwordError = current.password.isBlank()
 
-        if (hasEmailError || hasPasswordError) {
+        if (loginError || emailError || passwordError) {
             _state.value = current.copy(
-                emailError = hasEmailError,
-                passwordError = hasPasswordError,
-                errorMessage = "Fill in email and password"
+                loginError = loginError,
+                emailError = emailError,
+                passwordError = passwordError,
+                errorMessage = "Fill in all fields"
             )
             return
         }
@@ -66,6 +78,12 @@ class LoginViewModel @Inject constructor(
             )
 
             try {
+                authRepository.register(
+                    login = current.login.trim(),
+                    email = current.email.trim(),
+                    password = current.password
+                )
+
                 authRepository.login(
                     email = current.email.trim(),
                     password = current.password
@@ -73,19 +91,18 @@ class LoginViewModel @Inject constructor(
 
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    isLoggedIn = true
+                    isRegistered = true
                 )
             } catch (e: ClientRequestException) {
                 _state.value = _state.value.copy(
                     isLoading = false,
                     emailError = true,
-                    passwordError = true,
-                    errorMessage = "Wrong email or password"
+                    errorMessage = "Account already exists or data is invalid"
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    errorMessage = "Login failed"
+                    errorMessage = "Registration failed"
                 )
             }
         }

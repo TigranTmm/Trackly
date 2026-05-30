@@ -4,7 +4,7 @@
     <!-- TITLES -->
     <string name="home_title">HOME</string>
     <string name="profile_title">PROFILE</string>
-    <string name="all_tasks_title">ALL TASKS</string>
+    <string name="all_tasks_title">ANALYTICS</string>
 
     <!-- DIALOG -->
     <string name="enter_name">Enter sphere title</string>

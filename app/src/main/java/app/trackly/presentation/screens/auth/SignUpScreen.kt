@@ -32,16 +32,16 @@ import app.trackly.presentation.ui.theme.Red
 import app.trackly.presentation.ui.theme.Text
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onSignUpClick: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+fun SignUpScreen(
+    onSignUpSuccess: () -> Unit,
+    onLoginClick: () -> Unit,
+    viewModel: SignUpViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(state.isLoggedIn) {
-        if (state.isLoggedIn) {
-            onLoginSuccess()
+    LaunchedEffect(state.isRegistered) {
+        if (state.isRegistered) {
+            onSignUpSuccess()
         }
     }
 
@@ -52,21 +52,31 @@ fun LoginScreen(
             .padding(horizontal = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(90.dp))
+        Spacer(modifier = Modifier.height(82.dp))
 
         AuthLogo(size = 150)
 
-        Spacer(modifier = Modifier.height(42.dp))
+        Spacer(modifier = Modifier.height(38.dp))
 
         Text(
-            text = "Log In:",
+            text = "Sign Up:",
             color = Text,
             fontFamily = Montserrat,
             fontWeight = FontWeight.Bold,
             fontSize = 26.sp
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        AuthTextField(
+            value = state.login,
+            onValueChange = viewModel::onLoginChange,
+            label = "Login",
+            placeholder = "Enter your login",
+            isError = state.loginError
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
 
         AuthTextField(
             value = state.email,
@@ -76,7 +86,7 @@ fun LoginScreen(
             isError = state.emailError
         )
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         AuthTextField(
             value = state.password,
@@ -102,8 +112,8 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         PrimaryAuthButton(
-            text = if (state.isLoading) "Loading..." else "Log In",
-            onClick = viewModel::login,
+            text = if (state.isLoading) "Loading..." else "Create Account",
+            onClick = viewModel::signUp,
             enabled = !state.isLoading
         )
 
@@ -114,14 +124,14 @@ fun LoginScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don’t have an account? ",
+                text = "Already have an account? ",
                 color = GrayText,
                 fontFamily = Montserrat,
                 fontSize = 14.sp
             )
 
             Text(
-                text = "Sign Up",
+                text = "Log In",
                 color = PrimeWhite,
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.SemiBold,
@@ -131,7 +141,7 @@ fun LoginScreen(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    onSignUpClick()
+                    onLoginClick()
                 }
             )
         }

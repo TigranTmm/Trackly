@@ -22,8 +22,8 @@ sealed class ButtonItem(
     )
     object AllTask: ButtonItem(
         "AllTask",
-        R.drawable.calendar,
-        R.drawable.calendar_selected,
+        R.drawable.anal,
+        R.drawable.anal_selected,
         "ALL_TASKS"
     )
 }

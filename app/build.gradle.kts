@@ -88,6 +88,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    implementation("io.github.ehsannarmani:compose-charts:0.0.19")
 }
 
 configurations.all {

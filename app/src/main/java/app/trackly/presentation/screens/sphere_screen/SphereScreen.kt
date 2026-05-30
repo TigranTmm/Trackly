@@ -66,9 +66,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import app.trackly.R
 import app.trackly.domain.model.Task
 import app.trackly.presentation.screens.home.SphereItem
+import app.trackly.presentation.screens.sessionTimer.SessionTimerRoute
 import app.trackly.presentation.ui.theme.BackGr
 import app.trackly.presentation.ui.theme.Border
 import app.trackly.presentation.ui.theme.ButtonBg
@@ -88,9 +90,13 @@ fun SphereScreen(
     id: Long,
     title: String,
     colorKey: String,
+    navController: NavController,
     viewModel: SphereViewModel = hiltViewModel()
 ) {
     var showDialog by remember { mutableStateOf(false) }
+
+    var selectedTab by remember { mutableStateOf("TIME") }
+    val sessionsViewModel: SessionsViewModel = hiltViewModel()
 
     val tasks by viewModel.tasksList.collectAsState(emptyList())
 
@@ -131,7 +137,7 @@ fun SphereScreen(
                         .fillMaxWidth()
                 )
 
-                // STRICK
+                // TOP CARD
                 Box(
                     modifier = Modifier
                         .background(
@@ -148,7 +154,11 @@ fun SphereScreen(
                         .height(96.dp)
                 ) {
                     Text(
-                        text = "Tasks completed: ",
+                        text = if (selectedTab == "TASKS") {
+                            "Tasks completed: "
+                        } else {
+                            "Time track"
+                        },
                         fontFamily = Montserrat,
                         fontWeight = FontWeight.SemiBold,
                         color = Text,
@@ -156,140 +166,160 @@ fun SphereScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // TASKS_TITLE
-                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
-                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
-                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
-                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
-                /** ПЕРЕДЕЛАТЬ ПОТОМ СОРТИРОВКУ!!!!!! **/
-                Row() {
-                    Text(
-                        text = "Tasks:",
-                        fontFamily = Montserrat,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
-                        color = Text
-                    )
+                SphereTabs(
+                    selectedTab = selectedTab,
+                    onTabSelect = { selectedTab = it }
+                )
 
-                    Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    Checkbox(
-                        onCheckedChange = {
-                            viewModel.tasksOrder = "high_to_low"
-                        },
-                        checked = true,
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = Yellow,
-                            checkmarkColor = ShapeBg,
-                            uncheckedColor = Border
-                        ),
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                DaysOfWeek()
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // ADD_TASK_BUTTON
-                Box(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = { showDialog = true },
-                            indication = LocalIndication.current,
-                            interactionSource = remember { MutableInteractionSource() }
-                        )
-                        .drawBehind {
-                            val strokeWidth = 2.dp.toPx()
-                            val dashWidth = 8.dp.toPx()
-                            val gapWidth = 8.dp.toPx()
-
-                            drawRoundRect(
-                                color = ShapeBorder,
-                                style = Stroke(
-                                    width = strokeWidth,
-                                    pathEffect = PathEffect.dashPathEffect(
-                                        floatArrayOf(dashWidth, gapWidth)
-                                    )
-                                ),
-                                cornerRadius = CornerRadius(16.dp.toPx())
+                if (selectedTab == "TIME") {
+                    SessionsTabContent(
+                        sphereId = id,
+                        viewModel = sessionsViewModel,
+                        onOpenTimer = { sphereId, sessionId, sessionTitle, planSeconds ->
+                            navController.navigate(
+                                SessionTimerRoute.Timer.createRoute(
+                                    sphereId = sphereId,
+                                    sessionId = sessionId,
+                                    title = sessionTitle,
+                                    planSeconds = planSeconds
+                                )
                             )
                         }
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(32.dp)
-                ) {
-                    Row(modifier = Modifier
-                        .align(Alignment.Center),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.add_icon),
-                            contentDescription = "add_icon",
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .size(32.dp)
-                        )
-                        Text(
-                            text = "Add new task",
-                            fontFamily = Montserrat,
-                            fontWeight = FontWeight.Medium,
-                            color = Border,
-                            fontSize = 16.sp
-                        )
-                    }
-                }
-
-                // ADDING NEW TASK
-                if (showDialog) {
-                    AddTaskDialog(
-                        onDismiss = { showDialog = false },
-                        onAdd = { content, priority ->
-                            viewModel.addTask(content, priority)
-                            showDialog = false
-                        }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                if (selectedTab == "TASKS") {
+                    // TASKS_TITLE
+                    Row {
+                        Text(
+                            text = "Tasks:",
+                            fontFamily = Montserrat,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                            color = Text
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Checkbox(
+                            onCheckedChange = {
+                                viewModel.tasksOrder = "high_to_low"
+                            },
+                            checked = true,
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Yellow,
+                                checkmarkColor = ShapeBg,
+                                uncheckedColor = Border
+                            ),
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DaysOfWeek()
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // ADD_TASK_BUTTON
+                    Box(
+                        modifier = Modifier
+                            .clickable(
+                                onClick = { showDialog = true },
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                            .drawBehind {
+                                val strokeWidth = 2.dp.toPx()
+                                val dashWidth = 8.dp.toPx()
+                                val gapWidth = 8.dp.toPx()
+
+                                drawRoundRect(
+                                    color = ShapeBorder,
+                                    style = Stroke(
+                                        width = strokeWidth,
+                                        pathEffect = PathEffect.dashPathEffect(
+                                            floatArrayOf(dashWidth, gapWidth)
+                                        )
+                                    ),
+                                    cornerRadius = CornerRadius(16.dp.toPx())
+                                )
+                            }
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .height(32.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.add_icon),
+                                contentDescription = "add_icon",
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .size(32.dp)
+                            )
+
+                            Text(
+                                text = "Add new task",
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.Medium,
+                                color = Border,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+
+                    if (showDialog) {
+                        AddTaskDialog(
+                            onDismiss = { showDialog = false },
+                            onAdd = { content, priority ->
+                                viewModel.addTask(content, priority)
+                                showDialog = false
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
 
 
             // TASKS
-            items(tasks, key = { it.id ?: it.content.hashCode() }) { task ->
-                val dismissState = rememberSwipeToDismissBoxState(
-                    positionalThreshold = { it * 0.75f },
-                    confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-                            viewModel.deleteTask(task)
-                        }
+            if (selectedTab == "TASKS") {
+                items(tasks, key = { it.id }) { task ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        positionalThreshold = { it * 0.75f },
+                        confirmValueChange = { value ->
+                            if (value == SwipeToDismissBoxValue.EndToStart) {
+                                viewModel.deleteTask(task)
+                            }
 
-                        false
-                    }
-                )
-
-                SwipeToDismissBox(
-                    state = dismissState,
-                    enableDismissFromStartToEnd = false,
-                    enableDismissFromEndToStart = true,
-                    backgroundContent = { TaskDeleteBackground() }
-                ) {
-                    TaskItem(
-                        task,
-                        onCheckedChange = { updated ->
-                            viewModel.updateTask(updated)
+                            false
                         }
                     )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        enableDismissFromEndToStart = true,
+                        backgroundContent = { TaskDeleteBackground() }
+                    ) {
+                        TaskItem(
+                            task,
+                            onCheckedChange = { updated ->
+                                viewModel.updateTask(updated)
+                            }
+                        )
+                    }
                 }
             }
-
-
 
 
         }
@@ -633,5 +663,45 @@ fun Prev() {
             modifier = Modifier
                 .padding(end = 8.dp)
         )
+    }
+}
+
+@Composable
+private fun SphereTabs(
+    selectedTab: String,
+    onTabSelect: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Button(
+            onClick = { onTabSelect("TIME") },
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedTab == "TIME") ShapeBg else BackGr,
+                contentColor = if (selectedTab == "TIME") Text else GrayText
+            )
+        ) {
+            Text(
+                text = "Time track",
+                fontFamily = Montserrat
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Button(
+            onClick = { onTabSelect("TASKS") },
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedTab == "TASKS") ShapeBg else BackGr,
+                contentColor = if (selectedTab == "TASKS") Text else GrayText
+            )
+        ) {
+            Text(
+                text = "Tasks list",
+                fontFamily = Montserrat
+            )
+        }
     }
 }

@@ -62,6 +62,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import app.trackly.R
 import app.trackly.domain.model.Sphere
+import app.trackly.presentation.screens.add_sphere.AddSphereRoute
+import app.trackly.presentation.screens.sphereColorByKey
+import app.trackly.presentation.screens.sphereIconByKey
 import app.trackly.presentation.screens.sphere_screen.SphereScreenRoute
 import app.trackly.presentation.ui.theme.BackGr
 import app.trackly.presentation.ui.theme.Blue
@@ -86,6 +89,8 @@ fun HomeScreen(
 ) {
     val spheres by viewModel.spheresList.collectAsState(emptyList())
 
+    val uiState by viewModel.uiState.collectAsState()
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -97,8 +102,6 @@ fun HomeScreen(
             ).show()
         }
     }
-
-    var showDialog by remember { mutableStateOf(false) }
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -127,29 +130,10 @@ fun HomeScreen(
                 )
 
                 // STRICK
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = ShapeBg,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = ShapeBorder,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(170.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.days_completed),
-                        fontFamily = Montserrat,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Text,
-                        fontSize = 18.sp
-                    )
-                }
+                WeeklyReviewCard(
+                    analytics = uiState.weeklyAnalytics,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -168,8 +152,10 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .clickable(
-                            onClick = { showDialog = true },
-                            indication = LocalIndication.current,
+                            onClick = {
+                                navController.navigate(AddSphereRoute.AddSphere.route)
+                            },
+                            indication = null,
                             interactionSource = interactionSource
                         ) // showing dialogue
                         .drawBehind {
@@ -212,17 +198,6 @@ fun HomeScreen(
                             fontSize = 16.sp
                         )
                     }
-                }
-
-                // ADDING NEW SPHERE
-                if (showDialog) {
-                    AddSphereDialog(
-                        onDismiss = { showDialog = false },
-                        onAdd = { title, color ->
-                            viewModel.addSphere(title, color)
-                            showDialog = false
-                        }
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -295,13 +270,20 @@ fun SphereItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(32.dp)
                     .background(
-                        color = Sphere.primaryColors[sphere.colorKey] ?: BackGr,
+                        color = sphereColorByKey(sphere.colorKey),
                         shape = CircleShape
                     )
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = sphereIconByKey(sphere.iconKey)),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
 
             Spacer(modifier = Modifier
                 .fillMaxHeight()

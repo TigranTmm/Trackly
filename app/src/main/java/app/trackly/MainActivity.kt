@@ -5,18 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,10 +18,17 @@ import androidx.navigation.navArgument
 import app.trackly.presentation.navigation.AuthRoute
 import app.trackly.presentation.navigation.bottom_bar.BottomNavigationBar
 import app.trackly.presentation.navigation.bottom_bar.ButtonItem
-import app.trackly.presentation.screens.all_tasks.AllTasksScreen
+import app.trackly.presentation.screens.add_sphere.AddSphereRoute
+import app.trackly.presentation.screens.add_sphere.AddSphereScreen
+import app.trackly.presentation.screens.analytics.AllTasksScreen
+import app.trackly.presentation.screens.auth.FirstEntranceScreen
 import app.trackly.presentation.screens.auth.LoginScreen
+import app.trackly.presentation.screens.auth.SignUpScreen
+import app.trackly.presentation.screens.auth.SplashScreen
 import app.trackly.presentation.screens.home.HomeScreen
 import app.trackly.presentation.screens.profile.ProfileScreen
+import app.trackly.presentation.screens.sessionTimer.SessionTimerRoute
+import app.trackly.presentation.screens.sessionTimer.SessionTimerScreen
 import app.trackly.presentation.screens.sphere_screen.SphereScreen
 import app.trackly.presentation.screens.sphere_screen.SphereScreenRoute
 import app.trackly.presentation.ui.theme.BackGr
@@ -55,8 +54,8 @@ class MainActivity : ComponentActivity() {
                     ?.route
 
                 val showBottomBar = currentRoute in listOf(
-                    ButtonItem.Profile.route,
                     ButtonItem.Home.route,
+                    ButtonItem.Profile.route,
                     ButtonItem.AllTask.route
                 )
 
@@ -68,10 +67,10 @@ class MainActivity : ComponentActivity() {
                                 onNavigate = { route ->
                                     navController.navigate(route) {
                                         launchSingleTop = true
-                                        popUpTo(navController.graph.startDestinationId) {
+                                        restoreState = true
+                                        popUpTo(ButtonItem.Home.route) {
                                             saveState = true
                                         }
-                                        restoreState = true
                                     }
                                 }
                             )
@@ -80,15 +79,22 @@ class MainActivity : ComponentActivity() {
                 ) { padding ->
                     NavHost(
                         navController = navController,
-                        startDestination = AuthRoute.Login.route,
+                        startDestination = AuthRoute.Splash.route,
                         modifier = Modifier
                             .padding(padding)
                     ) {
-                        composable(AuthRoute.Login.route) {
-                            LoginScreen(
-                                onLoginSuccess = {
+                        composable(AuthRoute.Splash.route) {
+                            SplashScreen(
+                                onAuthorized = {
                                     navController.navigate(ButtonItem.Home.route) {
-                                        popUpTo(AuthRoute.Login.route) {
+                                        popUpTo(AuthRoute.Splash.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                },
+                                onUnauthorized = {
+                                    navController.navigate(AuthRoute.FirstEntrance.route) {
+                                        popUpTo(AuthRoute.Splash.route) {
                                             inclusive = true
                                         }
                                     }
@@ -96,8 +102,71 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable(AuthRoute.FirstEntrance.route) {
+                            FirstEntranceScreen(
+                                onLoginClick = {
+                                    navController.navigate(AuthRoute.Login.route)
+                                },
+                                onSignUpClick = {
+                                    navController.navigate(AuthRoute.SignUp.route)
+                                }
+                            )
+                        }
+
+                        composable(AuthRoute.Login.route) {
+                            LoginScreen(
+                                onLoginSuccess = {
+                                    navController.navigate(ButtonItem.Home.route) {
+                                        popUpTo(AuthRoute.FirstEntrance.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                },
+                                onSignUpClick = {
+                                    navController.navigate(AuthRoute.SignUp.route)
+                                }
+                            )
+                        }
+
+                        composable(AuthRoute.SignUp.route) {
+                            SignUpScreen(
+                                onSignUpSuccess = {
+                                    navController.navigate(ButtonItem.Home.route) {
+                                        popUpTo(AuthRoute.FirstEntrance.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                },
+                                onLoginClick = {
+                                    navController.navigate(AuthRoute.Login.route)
+                                }
+                            )
+                        }
+
                         composable(ButtonItem.Home.route) { HomeScreen(navController) }
-                        composable(ButtonItem.Profile.route) { ProfileScreen() }
+                        composable(ButtonItem.Profile.route) {
+                            ProfileScreen(
+                                onLogout = {
+                                    navController.navigate(AuthRoute.FirstEntrance.route) {
+                                        popUpTo(0) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            )
+                        }
+
+                        composable(AddSphereRoute.AddSphere.route) {
+                            AddSphereScreen(
+                                onClose = {
+                                    navController.popBackStack()
+                                },
+                                onSaved = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
                         composable(ButtonItem.AllTask.route) { AllTasksScreen() }
 
 
@@ -112,7 +181,29 @@ class MainActivity : ComponentActivity() {
                             SphereScreen(
                                 id = backStackEntry.arguments!!.getLong("id"),
                                 title = backStackEntry.arguments!!.getString("title")!!,
-                                colorKey = backStackEntry.arguments!!.getString("colorKey")!!
+                                colorKey = backStackEntry.arguments!!.getString("colorKey")!!,
+                                navController = navController
+                            )
+                        }
+
+
+                        composable(
+                            route = SessionTimerRoute.Timer.route,
+                            arguments = listOf(
+                                navArgument("sphereId") { type = NavType.LongType },
+                                navArgument("sessionId") { type = NavType.LongType },
+                                navArgument("title") { type = NavType.StringType },
+                                navArgument("planSeconds") { type = NavType.IntType }
+                            )
+                        ) { backStackEntry ->
+                            SessionTimerScreen(
+                                sphereId = backStackEntry.arguments!!.getLong("sphereId"),
+                                sessionId = backStackEntry.arguments!!.getLong("sessionId"),
+                                title = backStackEntry.arguments!!.getString("title")!!,
+                                planSeconds = backStackEntry.arguments!!.getInt("planSeconds"),
+                                onFinished = {
+                                    navController.popBackStack()
+                                }
                             )
                         }
                     }

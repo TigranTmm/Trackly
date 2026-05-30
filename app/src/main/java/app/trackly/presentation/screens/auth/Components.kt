@@ -55,17 +55,11 @@ fun PrimaryAuthButton(
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Yellow,
-            contentColor = Text
+            contentColor = BackGr
         ),
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .shadow(
-                elevation = 18.dp,
-                shape = RoundedCornerShape(12.dp),
-                ambientColor = Yellow,
-                spotColor = Yellow
-            )
     ) {
         Text(
             text = text,
@@ -174,7 +168,7 @@ fun AuthTextField(
                 if (value.isBlank()) {
                     Text(
                         text = placeholder,
-                        color = AuthText,
+                        color = AuthText.copy(0.5f),
                         fontFamily = Montserrat,
                         fontSize = 15.sp
                     )

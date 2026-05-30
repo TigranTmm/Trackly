@@ -31,11 +31,12 @@ val AuthText = Color(0xFFC4C4C4)
 
 
 /** EMPHASIS_COLORS **/
-val Red = Color(0xFFFF4C4C)
-val Orange = Color(0xFFFF8800)
+val Red = Color(0xFFFF4242)
+val Orange = Color(0xFFFF6F00)
 val Yellow = Color(0xFFFFC000)
-val Green = Color(0xFF00DA66)
-val Blue = Color(0xFF06A8FF)
+val Green = Color(0xFF01AF15)
+val Blue = Color(0xFF2072DC)
+val Purple = Color(0xFFA23FFF)
 val Gray = Color(0xFF71757F)
 
 

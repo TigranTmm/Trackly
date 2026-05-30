@@ -3,6 +3,7 @@ package app.trackly.domain.repository
 interface AuthRepository {
 
     suspend fun register(
+        login: String,
         email: String,
         password: String
     )
