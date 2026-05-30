@@ -38,6 +38,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,10 +86,21 @@ fun HomeScreen(
 ) {
     val spheres by viewModel.spheresList.collectAsState(emptyList())
 
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.message.collect { message ->
+            Toast.makeText(
+                context,
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     var showDialog by remember { mutableStateOf(false) }
 
     val interactionSource = remember { MutableInteractionSource() }
-
 
 
     Scaffold(
@@ -217,14 +229,12 @@ fun HomeScreen(
             }
 
             // SPHERES
-            items(spheres, key = { it.id ?: it.title.hashCode() }) { sphere ->
+            items(spheres, key = { it.id }) { sphere ->
                 val dismissState = rememberSwipeToDismissBoxState(
                     positionalThreshold = { it * 0.75f },
                     confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-                            viewModel.deleteSphere(sphere)
-                            true
-                        } else false
+                        if (value == SwipeToDismissBoxValue.EndToStart) viewModel.deleteSphere(sphere)
+                        false
                     }
                 )
 
@@ -241,9 +251,9 @@ fun HomeScreen(
                         onClick = {
                             navController.navigate(
                                 route = SphereScreenRoute.Sphere.createRoute(
-                                    id = sphere.id!!,
+                                    id = sphere.id,
                                     title = sphere.title,
-                                    color = sphere.color
+                                    colorKey = sphere.colorKey
                                 )
                             )
                         }
@@ -288,7 +298,7 @@ fun SphereItem(
                 modifier = Modifier
                     .size(32.dp)
                     .background(
-                        color = Sphere.primaryColors[sphere.color] ?: BackGr,
+                        color = Sphere.primaryColors[sphere.colorKey] ?: BackGr,
                         shape = CircleShape
                     )
             )
@@ -492,5 +502,5 @@ fun DeleteBackground() {
 
 @Preview(showSystemUi = true)
 @Composable
-fun prev() {
+fun Prev() {
 }

@@ -1,10 +1,9 @@
 package app.trackly.di
 
-import android.app.Application
-import androidx.room.Room
-import app.trackly.data.model.TracklyDataBase
+import app.trackly.data.repository.AuthRepositoryImpl
 import app.trackly.data.repository.SphereRepositoryImpl
 import app.trackly.data.repository.TaskRepositoryImpl
+import app.trackly.domain.repository.AuthRepository
 import app.trackly.domain.repository.SphereRepository
 import app.trackly.domain.repository.TaskRepository
 import app.trackly.domain.use_cases.sphere_use_cases.DeleteSphere
@@ -29,56 +28,60 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Database
+
+    // AuthRepository
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): TracklyDataBase {
-        return Room.databaseBuilder(
-            app,
-            TracklyDataBase::class.java,
-            TracklyDataBase.DATABASE_NAME
-        ).fallbackToDestructiveMigration().build()
+    fun provideAuthRepository(impl: AuthRepositoryImpl): AuthRepository {
+        return impl
     }
 
-    // Task Repository
+    // SphereRepository
     @Provides
     @Singleton
-    fun provideTaskRepository(db: TracklyDataBase): TaskRepository {
-        return TaskRepositoryImpl(db.taskDao)
+    fun provideSphereRepository(
+        impl: SphereRepositoryImpl
+    ): SphereRepository {
+        return impl
     }
 
-    // Sphere Repository
+    //TaskRepository
     @Provides
     @Singleton
-    fun provideSphereRepository(db: TracklyDataBase): SphereRepository {
-        return SphereRepositoryImpl(db.sphereDao)
+    fun provideTaskRepository(
+        impl: TaskRepositoryImpl
+    ): TaskRepository {
+        return impl
     }
 
-
-    // Task Use Cases
+    //SphereUseCases
     @Provides
     @Singleton
-    fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
-        return TaskUseCases(
-            getAllTasks = GetAllTasks(repository),
-            getTask = GetTask(repository),
-            getTasksBySphere = GetTasksBySphere(repository),
-            insertTask = InsertTask(repository),
-            deleteTask = DeleteTask(repository),
-            updateTask = UpdateTask(repository)
-        )
-    }
-
-    // Sphere Repository
-    @Provides
-    @Singleton
-    fun provideSphereUseCases(repository: SphereRepository): SphereUseCases {
+    fun provideSphereUseCases(
+        repository: SphereRepository
+    ): SphereUseCases {
         return SphereUseCases(
             getAllSpheres = GetAllSpheres(repository),
             getSphere = GetSphere(repository),
             insertSphere = InsertSphere(repository),
             deleteSphere = DeleteSphere(repository),
             updateSphere = UpdateSphere(repository)
+        )
+    }
+
+    //TaskUseCases
+    @Provides
+    @Singleton
+    fun provideTaskUseCases(
+        repository: TaskRepository
+    ): TaskUseCases {
+        return TaskUseCases(
+            getAllTasks = GetAllTasks(repository),
+            getTasksBySphere = GetTasksBySphere(repository),
+            getTask = GetTask(repository),
+            insertTask = InsertTask(repository),
+            deleteTask = DeleteTask(repository),
+            updateTask = UpdateTask(repository)
         )
     }
 }

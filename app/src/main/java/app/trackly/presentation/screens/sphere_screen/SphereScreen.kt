@@ -2,7 +2,7 @@
 
 package app.trackly.presentation.screens.sphere_screen
 
-import android.graphics.Paint
+import app.trackly.domain.model.TaskPriority
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
@@ -85,9 +85,9 @@ import app.trackly.presentation.ui.theme.Yellow
 
 @Composable
 fun SphereScreen(
-    id: Int,
+    id: Long,
     title: String,
-    color: String,
+    colorKey: String,
     viewModel: SphereViewModel = hiltViewModel()
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -95,6 +95,18 @@ fun SphereScreen(
     val tasks by viewModel.tasksList.collectAsState(emptyList())
 
     LaunchedEffect(id) { viewModel.getSphereId(id) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.message.collect { message ->
+            Toast.makeText(
+                context,
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     Scaffold(
         containerColor = BackGr
@@ -256,8 +268,9 @@ fun SphereScreen(
                     confirmValueChange = { value ->
                         if (value == SwipeToDismissBoxValue.EndToStart) {
                             viewModel.deleteTask(task)
-                            true
-                        } else false
+                        }
+
+                        false
                     }
                 )
 
@@ -297,9 +310,9 @@ fun TaskItem(
                 .padding(bottom = 16.dp, end = 8.dp)
                 .background(
                     color = when (task.priority) {
-                        2 -> Red
-                        1 -> Orange
-                        else -> BackGr
+                        TaskPriority.HIGH -> Red
+                        TaskPriority.MEDIUM -> Orange
+                        TaskPriority.LOW -> BackGr
                     },
                     shape = RoundedCornerShape(8.dp)
                 )
@@ -331,11 +344,11 @@ fun TaskItem(
                     text = task.content,
                     fontFamily = Montserrat,
                     fontWeight = FontWeight.SemiBold,
-                    textDecoration = when(task.completed) {
+                    textDecoration = when(task.isCompleted) {
                         true -> TextDecoration.LineThrough
                         else -> TextDecoration.None
                     },
-                    color = when(task.completed) {
+                    color = when(task.isCompleted) {
                         true -> Gray
                         else -> Text
                     },
@@ -346,10 +359,10 @@ fun TaskItem(
                 Checkbox(
                     onCheckedChange = {
                         onCheckedChange(
-                            Task(task.id, task.sphereId, task.content, task.priority, !task.completed)
+                            task.copy(isCompleted = !task.isCompleted)
                         )
                     },
-                    checked = task.completed,
+                    checked = task.isCompleted,
                     colors = CheckboxDefaults.colors(
                         checkedColor = Yellow,
                         checkmarkColor = ShapeBg,
@@ -418,10 +431,10 @@ fun TaskDeleteBackground() {
 @Composable
 fun AddTaskDialog(
     onDismiss: () -> Unit,
-    onAdd: (String, Int) -> Unit
+    onAdd: (String, TaskPriority) -> Unit
 ) {
     var content by remember { mutableStateOf("") }
-    var selectedPriority by remember { mutableIntStateOf(0) }
+    var selectedPriority by remember { mutableStateOf(TaskPriority.LOW) }
     val context = LocalContext.current
 
     AlertDialog(
@@ -476,8 +489,8 @@ fun AddTaskDialog(
                     PriorityItem(
                         text = "Low",
                         color = Gray,
-                        selected = selectedPriority == 0,
-                        onClick = { selectedPriority = 0 }
+                        selected = selectedPriority == TaskPriority.LOW,
+                        onClick = { selectedPriority = TaskPriority.LOW }
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -485,8 +498,8 @@ fun AddTaskDialog(
                     PriorityItem(
                         text = "Mid",
                         color = Orange,
-                        selected = selectedPriority == 1,
-                        onClick = { selectedPriority = 1 }
+                        selected = selectedPriority == TaskPriority.MEDIUM,
+                        onClick = { selectedPriority = TaskPriority.MEDIUM }
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -494,8 +507,8 @@ fun AddTaskDialog(
                     PriorityItem(
                         text = "High",
                         color = Red,
-                        selected = selectedPriority == 2,
-                        onClick = { selectedPriority = 2 }
+                        selected = selectedPriority == TaskPriority.HIGH,
+                        onClick = { selectedPriority = TaskPriority.HIGH }
                     )
                 }
             }

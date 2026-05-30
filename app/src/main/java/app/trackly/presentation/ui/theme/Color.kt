@@ -10,6 +10,9 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
+/** Primary **/
+val PrimeWhite = Color(0xFFE8E8E8)
+
 
 /** BG_COLOR **/
 val BackGr = Color(0xFF121313)
@@ -24,6 +27,7 @@ val PriorityBg = Color(0xFF414243)
 /** TEXT_COLORS **/
 val Text = Color(0xFFE8E8E8)
 val GrayText = Color(0xFF606060)
+val AuthText = Color(0xFFC4C4C4)
 
 
 /** EMPHASIS_COLORS **/
@@ -37,3 +41,8 @@ val Gray = Color(0xFF71757F)
 
 /** BOTTOM_NAV **/
 val BNbg = Color(0xFF313336)
+
+
+/** ERROR **/
+val ErrorRed = Color(0xFFA62D2D)
+val ErrorBg = Color(0xFF1F1312)

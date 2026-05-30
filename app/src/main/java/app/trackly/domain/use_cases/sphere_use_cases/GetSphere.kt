@@ -6,7 +6,7 @@ import app.trackly.domain.repository.SphereRepository
 class GetSphere(
     private val repository: SphereRepository
 ) {
-    suspend operator fun invoke(id: Int?): Sphere? {
+    suspend operator fun invoke(id: Long?): Sphere? {
         return repository.getSphere(id)
     }
 }

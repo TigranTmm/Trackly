@@ -4,11 +4,12 @@ import app.trackly.domain.model.Task
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
+
+    suspend fun getTask(sphereId: Long, taskId: Long): Task?
+
     fun getAllTasks(): Flow<List<Task>>
 
-    fun getTasksBySphere(sphereId: Int): Flow<List<Task>>
-
-    suspend fun getTask(id: Int): Task?
+    fun getTasksBySphere(sphereId: Long): Flow<List<Task>>
 
     suspend fun insertTask(task: Task)
 

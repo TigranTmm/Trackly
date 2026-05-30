@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 class GetTasksBySphere(
     private val repository: TaskRepository
 ) {
-    operator fun invoke(sphereId: Int, order: String = "default"): Flow<List<Task>> {
+    operator fun invoke(sphereId: Long, order: String = "default"): Flow<List<Task>> {
         return repository.getTasksBySphere(sphereId).map { tasks ->
             when (order) {
                 "low_to_high" -> tasks.sortedBy { it.priority }

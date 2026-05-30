@@ -6,7 +6,7 @@ import app.trackly.domain.repository.TaskRepository
 class GetTask(
     private val repository: TaskRepository
 ) {
-    suspend operator fun invoke(id: Int): Task? {
-        return repository.getTask(id)
+    suspend operator fun invoke(sphereId: Long, taskId: Long): Task? {
+        return repository.getTask(sphereId, taskId)
     }
 }

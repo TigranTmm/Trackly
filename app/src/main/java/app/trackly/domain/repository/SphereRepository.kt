@@ -4,13 +4,14 @@ import app.trackly.domain.model.Sphere
 import kotlinx.coroutines.flow.Flow
 
 interface SphereRepository {
-    fun getAllSpheres(): Flow<List<Sphere>>
-
-    suspend fun getSphere(id: Int?): Sphere?
 
     suspend fun insertSphere(sphere: Sphere)
 
-    suspend fun deleteSphere(sphere: Sphere)
+    fun getAllSpheres(): Flow<List<Sphere>>
+
+    suspend fun getSphere(id: Long?): Sphere?
 
     suspend fun updateSphere(sphere: Sphere)
+
+    suspend fun deleteSphere(sphere: Sphere)
 }

@@ -23,9 +23,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import app.trackly.presentation.navigation.AuthRoute
 import app.trackly.presentation.navigation.bottom_bar.BottomNavigationBar
 import app.trackly.presentation.navigation.bottom_bar.ButtonItem
 import app.trackly.presentation.screens.all_tasks.AllTasksScreen
+import app.trackly.presentation.screens.auth.LoginScreen
 import app.trackly.presentation.screens.home.HomeScreen
 import app.trackly.presentation.screens.profile.ProfileScreen
 import app.trackly.presentation.screens.sphere_screen.SphereScreen
@@ -52,28 +54,48 @@ class MainActivity : ComponentActivity() {
                     ?.destination
                     ?.route
 
+                val showBottomBar = currentRoute in listOf(
+                    ButtonItem.Profile.route,
+                    ButtonItem.Home.route,
+                    ButtonItem.AllTask.route
+                )
+
                 Scaffold(
                     bottomBar = {
-                        BottomNavigationBar(
-                            currentRoute = currentRoute,
-                            onNavigate = { route ->
-                                navController.navigate(route) {
-                                    launchSingleTop = true
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                        if (showBottomBar) {
+                            BottomNavigationBar(
+                                currentRoute = currentRoute,
+                                onNavigate = { route ->
+                                    navController.navigate(route) {
+                                        launchSingleTop = true
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        restoreState = true
                                     }
-                                    restoreState = true
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 ) { padding ->
                     NavHost(
                         navController = navController,
-                        startDestination = ButtonItem.Home.route,
+                        startDestination = AuthRoute.Login.route,
                         modifier = Modifier
                             .padding(padding)
                     ) {
+                        composable(AuthRoute.Login.route) {
+                            LoginScreen(
+                                onLoginSuccess = {
+                                    navController.navigate(ButtonItem.Home.route) {
+                                        popUpTo(AuthRoute.Login.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            )
+                        }
+
                         composable(ButtonItem.Home.route) { HomeScreen(navController) }
                         composable(ButtonItem.Profile.route) { ProfileScreen() }
                         composable(ButtonItem.AllTask.route) { AllTasksScreen() }
@@ -82,15 +104,15 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = SphereScreenRoute.Sphere.route,
                             arguments = listOf(
-                                navArgument("id") { type = NavType.IntType },
+                                navArgument("id") { type = NavType.LongType },
                                 navArgument("title") { type = NavType.StringType },
-                                navArgument("color") { type = NavType.StringType }
+                                navArgument("colorKey") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
                             SphereScreen(
-                                id = backStackEntry.arguments!!.getInt("id"),
+                                id = backStackEntry.arguments!!.getLong("id"),
                                 title = backStackEntry.arguments!!.getString("title")!!,
-                                color = backStackEntry.arguments!!.getString("color")!!
+                                colorKey = backStackEntry.arguments!!.getString("colorKey")!!
                             )
                         }
                     }

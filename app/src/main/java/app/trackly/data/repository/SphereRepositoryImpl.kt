@@ -1,30 +1,66 @@
 package app.trackly.data.repository
 
-import app.trackly.data.model.SphereDao
+import app.trackly.data.remote.TracklyApi
+import app.trackly.data.remote.dto.toDomain
+import app.trackly.data.remote.dto.toRequestDto
 import app.trackly.domain.model.Sphere
 import app.trackly.domain.repository.SphereRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SphereRepositoryImpl(
-    private val dao: SphereDao
+@Singleton
+class SphereRepositoryImpl @Inject constructor(
+    private val api: TracklyApi
 ) : SphereRepository {
-    override fun getAllSpheres(): Flow<List<Sphere>> {
-        return dao.getAllSpheres()
-    }
 
-    override suspend fun getSphere(id: Int?): Sphere? {
-        return dao.getSphere(id)
-    }
+    private val spheres = MutableStateFlow<List<Sphere>>(emptyList())
 
     override suspend fun insertSphere(sphere: Sphere) {
-        dao.insertSphere(sphere)
+        val createdSphere = api.createSphere(
+            sphere.toRequestDto()
+        ).toDomain()
+
+        spheres.value += createdSphere
     }
 
-    override suspend fun deleteSphere(sphere: Sphere) {
-        dao.deleteSphere(sphere)
+    override fun getAllSpheres(): Flow<List<Sphere>> = flow {
+        refreshSpheres()
+        emitAll(spheres)
+    }
+
+
+    override suspend fun getSphere(id: Long?): Sphere? {
+        if (id == null) return null
+
+        return api.getSphere(id).toDomain()
     }
 
     override suspend fun updateSphere(sphere: Sphere) {
-        dao.updateSphere(sphere)
+        val updatedSphere = api.updateSphere(
+            id = sphere.id,
+            request = sphere.toRequestDto()
+        ).toDomain()
+
+        spheres.value = spheres.value.map {
+            if (it.id == updatedSphere.id) updatedSphere else it
+        }
+    }
+
+    override suspend fun deleteSphere(sphere: Sphere) {
+        api.deleteSphere(sphere.id)
+
+        spheres.value = spheres.value.filterNot {
+            it.id == sphere.id
+        }
+    }
+
+    private suspend fun refreshSpheres() {
+        spheres.value = api.getSpheres().map {
+            it.toDomain()
+        }
     }
 }

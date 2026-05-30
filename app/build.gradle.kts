@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
-    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
 }
 
 android {
@@ -66,10 +66,6 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
@@ -82,4 +78,21 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+    implementation("io.ktor:ktor-client-android:2.3.12")
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    implementation("io.ktor:ktor-client-logging:2.3.12")
+    implementation("io.ktor:ktor-client-auth:2.3.12")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    }
 }

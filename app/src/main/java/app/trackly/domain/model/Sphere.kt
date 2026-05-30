@@ -1,19 +1,17 @@
 package app.trackly.domain.model
 
-import androidx.compose.ui.graphics.Color
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import app.trackly.presentation.ui.theme.Blue
 import app.trackly.presentation.ui.theme.Green
 import app.trackly.presentation.ui.theme.Orange
 import app.trackly.presentation.ui.theme.Red
 import app.trackly.presentation.ui.theme.Yellow
 
-@Entity
 data class Sphere(
-    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    val id: Long,
     val title: String,
-    val color: String = "RED"
+    val colorKey: String,
+    val iconKey: String,
+    val hasTasks: Boolean
 ) {
     companion object {
         val primaryColors = mapOf(
